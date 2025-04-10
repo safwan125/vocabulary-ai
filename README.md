@@ -1,70 +1,110 @@
-# Getting Started with Create React App
+# AI Vocabulary Enhancement Bot
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+An intelligent vocabulary enhancement application built with React.js and Google's Gemini API. This app helps users expand their vocabulary by presenting new words daily with comprehensive information including definitions, examples, synonyms, antonyms, and etymology.
 
-## Available Scripts
+## Features
 
-In the project directory, you can run:
+- Generate vocabulary words of varying difficulty levels (easy, medium, advanced)
+- Detailed word information with definitions, usage examples, synonyms, and antonyms
+- Save words to history for later review
+- Customizable settings for word difficulty and daily reminders
+- Responsive design that works on desktop and mobile devices
 
-### `npm start`
+## Screenshots
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+(Add screenshots of your app here after running it)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Getting Started
 
-### `npm test`
+### Prerequisites
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+- Node.js (v14 or higher)
+- npm or yarn
+- Google Gemini API key
 
-### `npm run build`
+### Installation
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. Clone this repository:
+   ```
+   git clone <repository-url>
+   cd vocabulary_app
+   ```
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+2. Install dependencies:
+   ```
+   npm install
+   ```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+3. Set up your Gemini API key:
+   - Get an API key from [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Open `src/services/geminiService.js`
+   - Replace `'YOUR_GEMINI_API_KEY'` with your actual API key
 
-### `npm run eject`
+4. Start the development server:
+   ```
+   npm start
+   ```
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+5. Open [http://localhost:3000](http://localhost:3000) to view the app in your browser.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### Troubleshooting API Issues
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+If you're experiencing problems with the Gemini API:
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+1. **API Key Problems**:
+   - Make sure your API key is correctly entered in `src/services/geminiService.js`
+   - Verify your API key is active in [Google AI Studio](https://makersuite.google.com/app/apikey)
+   - Check that you haven't exceeded your API quota limits
 
-## Learn More
+2. **Network Issues**:
+   - The app has a built-in offline mode that activates automatically when the API can't be reached
+   - You'll see an "Offline Mode" indicator when using words from the offline collection
+   - Check your internet connection if consistently in offline mode
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+3. **Console Errors**:
+   - Open your browser's developer console (F12 in most browsers)
+   - Look for error messages related to the API calls
+   - These errors can provide more specific information about what's going wrong
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+4. **Content Safety Issues**:
+   - Google's Gemini API has built-in content filters
+   - If you're seeing errors, the API might be filtering content based on safety settings
+   - Try modifying difficulty levels or try again for a different word
 
-### Code Splitting
+## How to Use
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+1. **Generate a New Word**: Click the "Generate New Word" button to get a random vocabulary word based on your difficulty settings.
 
-### Analyzing the Bundle Size
+2. **Customize Settings**: Click the gear icon to:
+   - Change the word difficulty level
+   - Toggle daily word display
+   - Enable or disable daily reminders
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+3. **View Word History**: Click the "History" button to see words you've previously viewed. You can search and filter your word history.
 
-### Making a Progressive Web App
+4. **Review Word Details**: Each vocabulary card includes:
+   - The word and its part of speech
+   - Definition
+   - Example usage
+   - Synonyms and antonyms
+   - Etymology information
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+## Technical Implementation
 
-### Advanced Configuration
+- **React.js**: Frontend framework for building the user interface
+- **Google's Gemini API**: AI model for generating vocabulary words and related information
+- **Local Storage**: Used to save user settings and word history
+- **CSS3**: Custom styling with modern design patterns
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## License
 
-### Deployment
+[MIT](LICENSE)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Acknowledgments
 
-### `npm run build` fails to minify
+- Google for providing the Gemini API
+- React team for the amazing framework
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+---
+
+**Note**: This project is for educational purposes. Make sure to follow Google's API usage guidelines.
