@@ -96,7 +96,7 @@ export const getNewVocabularyWord = async (customDifficulty = null) => {
   try {
     console.log('Initializing Gemini API request...');
     // Use the standard gemini-pro model since flash version isn't available
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
     
     const difficulty = customDifficulty || getRandomDifficulty();
     console.log(`Requesting ${difficulty} level vocabulary word...`);

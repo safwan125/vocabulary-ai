@@ -97,7 +97,6 @@ function App() {
           >
             Generate New Word
           </button>
-          
           <div className="tools">
             <WordHistory 
               history={history} 
