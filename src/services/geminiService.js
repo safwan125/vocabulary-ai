@@ -96,7 +96,7 @@ export const getNewVocabularyWord = async (customDifficulty = null) => {
   try {
     console.log('Initializing Gemini API request...');
     // Use the standard gemini-pro model since flash version isn't available
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     
     const difficulty = customDifficulty || getRandomDifficulty();
     console.log(`Requesting ${difficulty} level vocabulary word...`);
@@ -176,9 +176,71 @@ export const getNewVocabularyWord = async (customDifficulty = null) => {
   }
 };
 
-// Create a named export object
+// Function to generate responses for the chatbot
+// Only responds to vocabulary-related queries
+export const generateVocabularyResponse = async (query) => {
+  try {
+    console.log('Generating vocabulary response for:', query);
+    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    
+    // The system prompt ensures the AI only responds to vocabulary-related queries
+    const systemPrompt = `You are a vocabulary assistant chatbot. Your only purpose is to help users with vocabulary-related questions.
+
+VERY IMPORTANT RULES YOU MUST FOLLOW:
+1. ONLY answer questions related to vocabulary, words, language, definitions, synonyms, antonyms, etymology, word usage, grammar, spelling, pronunciation, word origins, idioms, phrases, or language learning.
+2. If a user asks anything NOT directly related to vocabulary or language learning, politely decline to answer and explain that you can only help with vocabulary-related questions.
+3. NEVER respond to personal questions, current events, math problems, coding questions, general knowledge questions, or any topic outside your vocabulary focus.
+4. Keep your answers concise, educational, and focused on language learning.
+5. Provide examples where appropriate to help illustrate word usage.
+6. If asked about offensive words, provide academic definitions only with appropriate disclaimers.
+
+Examples of questions you SHOULD answer:
+- What does "ephemeral" mean?
+- What's the difference between "affect" and "effect"?
+- Can you explain the idiom "break the ice"?
+- What's the etymology of "serendipity"?
+- What are some synonyms for "happy"?
+- How do you spell "accommodate"?
+- What's the correct usage of semicolons?
+
+Examples of questions you SHOULD NOT answer:
+- What's the weather like today?
+- Who is the president?
+- Can you help me with my math homework?
+- What's your opinion on politics?
+- Tell me a joke.
+- How do I fix my computer?
+
+If a user asks a non-vocabulary question, respond with: "I'm your vocabulary assistant and can only help with questions about words, language, definitions, etymology, grammar, and similar topics. Please feel free to ask me about any vocabulary-related topic!"`;
+
+    // Create the prompt with the user's query
+    const result = await model.generateContent({
+      contents: [
+        { role: "system", parts: [{ text: systemPrompt }] },
+        { role: "user", parts: [{ text: query }] }
+      ],
+      generationConfig: {
+        temperature: 0.2,
+        topK: 40,
+        topP: 0.95,
+        maxOutputTokens: 800,
+      },
+    });
+
+    const response = result.response;
+    const text = response.text();
+    console.log('Generated response successfully');
+    return text;
+  } catch (error) {
+    console.error('Error generating vocabulary response:', error);
+    return "I'm having trouble answering your question right now. Please try again in a moment.";
+  }
+};
+
+// Create named export object
 const geminiService = {
-  getNewVocabularyWord
+  getNewVocabularyWord,
+  generateVocabularyResponse
 };
 
 export default geminiService; 

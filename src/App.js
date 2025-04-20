@@ -3,6 +3,7 @@ import './App.css';
 import VocabularyCard from './components/VocabularyCard';
 import Settings from './components/Settings';
 import WordHistory from './components/WordHistory';
+import ChatBot from './components/ChatBot';
 import { getNewVocabularyWord } from './services/geminiService';
 import { 
   saveSettings, 
@@ -85,7 +86,7 @@ function App() {
       <header className="App-header">
         <h1>Vocabulary Enhancer</h1>
         <p className="tagline">Expand your vocabulary one word at a time</p>
-        <div className="model-badge">Powered by Gemini Flash 2.0</div>
+        <div className="model-badge">Powered by Gemini AI</div>
       </header>
 
       <main className="App-main">
@@ -125,6 +126,8 @@ function App() {
       <footer className="App-footer">
         <p>&copy; {new Date().getFullYear()} Vocabulary Enhancer App</p>
       </footer>
+      
+      <ChatBot />
     </div>
   );
 }
