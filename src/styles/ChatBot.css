@@ -132,6 +132,16 @@
 .message.error {
   background: #fff2f2;
   color: #d32f2f;
+  border-left: 3px solid #d32f2f;
+}
+
+/* Add special styling for the error message content */
+.message.error .markdown-content {
+  color: #d32f2f;
+}
+
+.message.error .markdown-content p {
+  margin-bottom: 0;
 }
 
 .message-content {
@@ -142,6 +152,131 @@
   margin: 0;
   line-height: 1.4;
   white-space: pre-wrap;
+}
+
+/* Markdown content styles */
+.markdown-content {
+  width: 100%;
+}
+
+.markdown-content h1, 
+.markdown-content h2, 
+.markdown-content h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  color: #3d5afe;
+  font-weight: 600;
+}
+
+.markdown-content h1 {
+  font-size: 1.3rem;
+}
+
+.markdown-content h2 {
+  font-size: 1.2rem;
+}
+
+.markdown-content h3 {
+  font-size: 1.1rem;
+}
+
+.markdown-content p {
+  margin: 0 0 8px 0;
+  line-height: 1.4;
+}
+
+.markdown-content p:last-child {
+  margin-bottom: 0;
+}
+
+.markdown-content ul, 
+.markdown-content ol {
+  margin: 5px 0;
+  padding-left: 20px;
+}
+
+.markdown-content li {
+  margin-bottom: 3px;
+}
+
+.markdown-content code {
+  background: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: monospace;
+  font-size: 0.9em;
+}
+
+.markdown-content blockquote {
+  border-left: 3px solid #c0caf5;
+  padding-left: 10px;
+  margin: 8px 0;
+  color: #555;
+  font-style: italic;
+}
+
+.markdown-content strong {
+  color: #333;
+  font-weight: 600;
+}
+
+.markdown-content em {
+  color: #555;
+}
+
+/* Remove unused styles */
+/* Markdown components styles */
+.md-paragraph,
+.md-heading,
+.md-list,
+.md-ordered-list,
+.md-list-item,
+.md-inline-code,
+.md-code-block,
+.md-blockquote {
+  /* These classes aren't used anymore */
+  display: none;
+}
+
+/* Markdown styles - these are largely redundant now */
+.message.bot .message-content > div {
+  margin: 0;
+}
+
+.message.bot .message-content h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.15rem;
+  color: #3d5afe;
+}
+
+.message.bot .message-content h4 {
+  margin-top: 10px;
+  margin-bottom: 5px;
+  font-size: 1.05rem;
+}
+
+.message.bot .message-content p {
+  margin-bottom: 8px;
+}
+
+.message.bot .message-content ul, 
+.message.bot .message-content ol {
+  margin: 5px 0;
+  padding-left: 20px;
+}
+
+.message.bot .message-content li {
+  margin-bottom: 3px;
+}
+
+.message.bot .message-content a {
+  color: #3d5afe;
+  text-decoration: none;
+}
+
+.message.bot .message-content a:hover {
+  text-decoration: underline;
 }
 
 .message-time {
@@ -245,4 +380,16 @@
     right: 10px;
     bottom: 10px;
   }
+}
+
+/* Error content styling */
+.error-content {
+  width: 100%;
+}
+
+.error-content p {
+  margin: 0;
+  line-height: 1.4;
+  color: #d32f2f;
+  font-weight: 500;
 } 

@@ -2,7 +2,7 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize the Gemini API
 // Note: You'll need to replace this with your actual API key from Google AI Studio
-const API_KEY = 'AIzaSyDPEjaX_xvkC2zJmzrvJMud8WfvwoJNq80';
+const API_KEY = 'AIzaSyD5An0TWboetUB7Jf1X34VyrwIHLQb_8vE';
 const genAI = new GoogleGenerativeAI(API_KEY);
 
 // Function to generate a random difficulty level
@@ -102,22 +102,30 @@ export const getNewVocabularyWord = async (customDifficulty = null) => {
     console.log(`Requesting ${difficulty} level vocabulary word...`);
     
     // Create a prompt for generating a vocabulary word
-    const prompt = `Generate a ${difficulty} level English vocabulary word that would help someone expand their vocabulary. 
-    Return a JSON object with the following fields:
-    - word: the vocabulary word
-    - definition: a clear, concise definition
-    - example: a sentence using the word correctly
-    - synonyms: array of 3 synonyms
-    - antonyms: array of 3 antonyms (if applicable)
-    - etymology: brief origin of the word
-    - difficulty: "${difficulty}"
-    - partOfSpeech: the grammatical classification
-    
-    Format the response as a valid JSON object with no extra text.`;
+    const prompt = `You are a vocabulary expert. Generate a ${difficulty} level English vocabulary word that would be valuable for expanding someone's vocabulary.
+
+The word should be appropriate for the ${difficulty} difficulty level:
+- For 'easy': Common words that educated English speakers should know
+- For 'medium': More sophisticated words used in academic or professional contexts
+- For 'advanced': Rare, specialized, or particularly nuanced words
+
+Return a JSON object with the following fields ONLY:
+- word: the vocabulary word (a single word, not a phrase)
+- definition: a clear, concise definition that captures the primary meaning
+- example: an illustrative sentence showing proper usage in context
+- synonyms: array of exactly 3 synonyms, ordered from most to least common
+- antonyms: array of exactly 3 antonyms (if applicable), ordered from most to least common
+- etymology: brief origin of the word (language of origin and root meaning)
+- difficulty: "${difficulty}"
+- partOfSpeech: the grammatical classification (noun, verb, adjective, adverb, etc.)
+
+Format the response as a valid, parseable JSON object with no markdown, extra text, or explanations.
+Example format: {"word": "example", "definition": "...", ...}`;
 
     // Generate content from the model
     console.log('Sending request to Gemini API...');
     const result = await model.generateContent(prompt);
+    console.log(result)
     
     if (!result) {
       console.error('No result returned from Gemini API');
@@ -181,55 +189,120 @@ export const getNewVocabularyWord = async (customDifficulty = null) => {
 export const generateVocabularyResponse = async (query) => {
   try {
     console.log('Generating vocabulary response for:', query);
-    const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+    
+    // Basic pre-filtering for obvious non-vocabulary topics
+    const normalizedQuery = query.toLowerCase().trim();
+    
+    // Common non-vocabulary topics that should be rejected immediately
+    const nonVocabTopics = [
+      // Weather related
+      'weather', 'temperature', 'forecast', 'rain', 'sunny', 'cloudy', 'climate', 
+      // Math expressions
+      'what is 1+1', 'what is 2+2', 'calculate', 'equals', 'plus', 'minus', 'multiply', 
+      // General non-vocabulary
+      'how are you', 'who is the president', 'where is', 'when was', 'how do i fix', 
+      'tell me a joke'
+    ];
+    
+    // Check if query contains obvious non-vocabulary topics
+    if (nonVocabTopics.some(topic => normalizedQuery.includes(topic))) {
+      console.log('Non-vocabulary query detected, returning error message');
+      return "I can only help with vocabulary-related questions. Please ask me about word meanings, definitions, synonyms, language usage, or similar topics.";
+    }
+    
+    // Also detect math expressions with simple regex
+    if (/\d+\s*[+\-*\/=]\s*\d+/.test(normalizedQuery)) {
+      console.log('Math expression detected, returning error message');
+      return "I can only help with vocabulary-related questions. Please ask me about word meanings, definitions, synonyms, language usage, or similar topics.";
+    }
+    
+    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
     
     // The system prompt ensures the AI only responds to vocabulary-related queries
-    const systemPrompt = `You are a vocabulary assistant chatbot. Your only purpose is to help users with vocabulary-related questions.
+    const systemPrompt = `You are a vocabulary assistant chatbot with strict limitations. Your purpose is to help users with vocabulary-related questions.
 
-VERY IMPORTANT RULES YOU MUST FOLLOW:
-1. ONLY answer questions related to vocabulary, words, language, definitions, synonyms, antonyms, etymology, word usage, grammar, spelling, pronunciation, word origins, idioms, phrases, or language learning.
-2. If a user asks anything NOT directly related to vocabulary or language learning, politely decline to answer and explain that you can only help with vocabulary-related questions.
-3. NEVER respond to personal questions, current events, math problems, coding questions, general knowledge questions, or any topic outside your vocabulary focus.
-4. Keep your answers concise, educational, and focused on language learning.
-5. Provide examples where appropriate to help illustrate word usage.
-6. If asked about offensive words, provide academic definitions only with appropriate disclaimers.
+UNDERSTANDING VOCABULARY QUERIES:
+Vocabulary questions include:
+1. Word definitions, meanings, and usages
+2. Synonyms, antonyms, and related words
+3. Word etymology and origins
+4. Grammar, parts of speech, and syntax
+5. Spelling and pronunciation
+6. Idioms, phrases, and expressions
+7. Examples and sample sentences for words
+8. Language learning and vocabulary building
+9. Word roots, prefixes, and suffixes
+10. Differences between similar words
 
-Examples of questions you SHOULD answer:
-- What does "ephemeral" mean?
-- What's the difference between "affect" and "effect"?
-- Can you explain the idiom "break the ice"?
-- What's the etymology of "serendipity"?
-- What are some synonyms for "happy"?
-- How do you spell "accommodate"?
-- What's the correct usage of semicolons?
+EXAMPLES OF VOCABULARY QUERIES YOU SHOULD ANSWER:
+- "What does [word] mean?"
+- "Define [word]"
+- "What is the definition of [word]?"
+- "What are synonyms for [word]?"
+- "What are antonyms for [word]?"
+- "What is the etymology of [word]?"
+- "How do you pronounce [word]?"
+- "What is the correct usage of [word/phrase]?"
+- "What is the difference between [word] and [word]?"
+- "Is [word] a noun/verb/adjective/etc.?"
+- "What is the origin of [word/phrase]?"
+- "What does the idiom [idiom] mean?"
+- "How do you spell [word]?"
+- "What are some words that mean [concept]?"
+- "What is the plural/past tense/comparative form of [word]?"
+- "Can you give me an example sentence with [word]?"
+- "How is [word] used in a sentence?"
+- "Provide example sentences for [word]"
 
-Examples of questions you SHOULD NOT answer:
-- What's the weather like today?
-- Who is the president?
-- Can you help me with my math homework?
-- What's your opinion on politics?
-- Tell me a joke.
-- How do I fix my computer?
+NON-VOCABULARY QUERIES THAT YOU MUST NEVER ANSWER:
+- Math questions (e.g., "What is 1+1?")
+- Current events (e.g., "Who is the president?")
+- Personal advice (e.g., "Should I buy a car?")
+- General knowledge (e.g., "Where is France located?")
+- Coding or technology help
+- Medical or legal advice
+- Weather, news, or sports information
+- Jokes, stories, or creative writing not related to language
+- Personal opinions on politics, religion, etc.
 
-If a user asks a non-vocabulary question, respond with: "I'm your vocabulary assistant and can only help with questions about words, language, definitions, etymology, grammar, and similar topics. Please feel free to ask me about any vocabulary-related topic!"`;
+For ANY non-vocabulary topic, you MUST respond EXACTLY with: "I can only help with vocabulary-related questions. Please ask me about word meanings, definitions, synonyms, language usage, or similar topics."
 
-    // Create the prompt with the user's query
-    const result = await model.generateContent({
-      contents: [
-        { role: "system", parts: [{ text: systemPrompt }] },
-        { role: "user", parts: [{ text: query }] }
-      ],
-      generationConfig: {
-        temperature: 0.2,
-        topK: 40,
-        topP: 0.95,
-        maxOutputTokens: 800,
-      },
+RESPONSE FORMAT:
+Use markdown to format your responses:
+- Use **bold** for word definitions
+- Use *italics* for examples
+- Use bullet lists for synonyms, antonyms
+- Use ### for section headings
+
+CRITICAL: Your ONLY function is to help with vocabulary. Non-vocabulary questions MUST receive the exact error message.`;
+
+    // Create the chat configuration with system instructions
+    const generationConfig = {
+      temperature: 0.1, // Lower temperature for more consistent rule enforcement
+      topK: 40,
+      topP: 0.95,
+      maxOutputTokens: 800,
+    };
+
+    // Set up the chat session with the system prompt
+    const chat = model.startChat({
+      generationConfig,
+      systemInstruction: systemPrompt,
     });
 
-    const response = result.response;
-    const text = response.text();
+    // Send the user query to the chat
+    console.log('Sending request to Gemini API...');
+    const result = await chat.sendMessage(query);
+    
+    if (!result) {
+      console.error('No result returned from Gemini API');
+      throw new Error('No result from API');
+    }
+    
+    console.log('Response received from Gemini API');
+    const text = result.response.text();
     console.log('Generated response successfully');
+    
     return text;
   } catch (error) {
     console.error('Error generating vocabulary response:', error);

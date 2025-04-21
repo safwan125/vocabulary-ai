@@ -2,12 +2,53 @@ import React, { useState, useRef, useEffect } from 'react';
 import { generateVocabularyResponse } from '../services/geminiService';
 import '../styles/ChatBot.css';
 
+// Simple markdown-to-HTML converter for safe strings
+const convertMarkdownToHTML = (markdown) => {
+  if (!markdown) return '';
+  
+  // Safety measure - only process strings
+  if (typeof markdown !== 'string') {
+    return String(markdown);
+  }
+
+  let html = markdown;
+  
+  // Headers
+  html = html.replace(/### (.*?)\n/g, '<h3>$1</h3>\n');
+  html = html.replace(/## (.*?)\n/g, '<h2>$1</h2>\n');
+  html = html.replace(/# (.*?)\n/g, '<h1>$1</h1>\n');
+  
+  // Bold and Italic
+  html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+  html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+  
+  // Lists
+  html = html.replace(/^\* (.*?)$/gm, '<li>$1</li>');
+  html = html.replace(/^- (.*?)$/gm, '<li>$1</li>');
+  html = html.replace(/<\/li>\n<li>/g, '</li><li>');
+  html = html.replace(/<li>(.*?)(?=<\/li>|$)/g, '<ul><li>$1</li></ul>');
+  html = html.replace(/<\/ul>\n<ul>/g, '');
+  
+  // Code blocks
+  html = html.replace(/`([^`]+)`/g, '<code>$1</code>');
+  
+  // Blockquotes
+  html = html.replace(/^> (.*?)$/gm, '<blockquote>$1</blockquote>');
+  
+  // Line breaks and paragraphs
+  html = html.replace(/\n\n/g, '</p><p>');
+  html = '<p>' + html + '</p>';
+  html = html.replace(/<p><\/p>/g, '<p>&nbsp;</p>');
+  
+  return html;
+};
+
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
     {
       id: 1,
-      text: "Hi there! I'm your Vocabulary Assistant. Ask me about any word or vocabulary concept!",
+      text: "### Welcome to Vocabulary Assistant! 👋\n\nI'm a specialized chatbot that can **only** help with vocabulary-related questions such as:\n\n* Word definitions and meanings\n* Synonyms and antonyms\n* Etymology and word origins\n* Usage examples and grammar\n* Spelling and pronunciation\n\nPlease note that I cannot answer questions about other topics like current events, math, personal advice, or general knowledge. I'm here to help you expand your vocabulary!",
       sender: 'bot',
       timestamp: new Date().toISOString()
     }
@@ -45,11 +86,15 @@ const ChatBot = () => {
       // Call Gemini API
       const response = await generateVocabularyResponse(inputText);
       
+      // Check if this is an error response
+      const isErrorResponse = response.includes("I can only help with vocabulary-related questions");
+      
       // Add bot response
       const botMessage = {
         id: Date.now() + 1,
         text: response,
         sender: 'bot',
+        isError: isErrorResponse,
         timestamp: new Date().toISOString()
       };
       
@@ -75,6 +120,30 @@ const ChatBot = () => {
   const formatTime = (timestamp) => {
     const date = new Date(timestamp);
     return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+
+  // Render message content with markdown for bot messages
+  const renderMessageContent = (message) => {
+    if (message.sender === 'bot') {
+      // For error messages, render without markdown processing
+      if (message.isError) {
+        return (
+          <div className="error-content">
+            <p>{message.text}</p>
+          </div>
+        );
+      }
+      
+      // For normal bot messages, render with markdown
+      return (
+        <div 
+          className="markdown-content"
+          dangerouslySetInnerHTML={{ __html: convertMarkdownToHTML(message.text) }}
+        />
+      );
+    } else {
+      return <p>{message.text}</p>;
+    }
   };
 
   return (
@@ -108,7 +177,7 @@ const ChatBot = () => {
                 className={`message ${message.sender} ${message.isError ? 'error' : ''}`}
               >
                 <div className="message-content">
-                  <p>{message.text}</p>
+                  {renderMessageContent(message)}
                   <span className="message-time">{formatTime(message.timestamp)}</span>
                 </div>
               </div>
